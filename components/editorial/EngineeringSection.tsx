@@ -1,32 +1,27 @@
-'use client';
+"use client";
 
-import { useEffect, useRef } from 'react';
-import { gsap } from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import SectionLabel from '@/components/ui/SectionLabel';
+import { useEffect, useRef } from "react";
+import { gsap } from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 
 gsap.registerPlugin(ScrollTrigger);
 
 const ITEMS = [
   {
-    number: '01',
-    title: 'OPTICS',
-    desc: 'Controlled light from lens to sensor. Every optical element calculated, coated and aligned for maximum chromatic neutrality.',
+    title: "OPTICS",
+    desc: "Controlled light from lens to sensor. Every optical element calculated, coated and aligned for maximum chromatic neutrality.",
   },
   {
-    number: '02',
-    title: 'SENSOR',
-    desc: 'The exact point where photons convert to information. Tuned for wide dynamic range and organic color gradation.',
+    title: "SENSOR",
+    desc: "The exact point where photons convert to information. Tuned for wide dynamic range and organic color gradation.",
   },
   {
-    number: '03',
-    title: 'PROCESSING',
-    desc: 'Designed around preserving what the glass captures. No aggressive algorithmic noise crushing. No synthetic sharpening.',
+    title: "PROCESSING",
+    desc: "Designed around preserving what the glass captures. No aggressive algorithmic noise crushing. No synthetic sharpening.",
   },
   {
-    number: '04',
-    title: 'STRUCTURE',
-    desc: 'A rigid magnesium chassis built around physical tactile control. The grip, shutter, and dials disappear into muscle memory.',
+    title: "STRUCTURE",
+    desc: "A rigid magnesium chassis built around physical tactile control. The grip, shutter, and dials disappear into muscle memory.",
   },
 ];
 
@@ -40,17 +35,17 @@ export default function EngineeringSection() {
     if (!section || !list) return;
 
     const ctx = gsap.context(() => {
-      const rows = list.querySelectorAll<HTMLDivElement>('.eng-row');
+      const rows = list.querySelectorAll<HTMLDivElement>(".eng-row");
 
       gsap.from(rows, {
         opacity: 0,
         y: 20,
         duration: 0.7,
         stagger: 0.08,
-        ease: 'power2.out',
+        ease: "power2.out",
         scrollTrigger: {
           trigger: section,
-          start: 'top 75%',
+          start: "top 75%",
         },
       });
 
@@ -64,8 +59,8 @@ export default function EngineeringSection() {
           rows.forEach((r) => gsap.to(r, { opacity: 1, duration: 0.3 }));
         };
 
-        row.addEventListener('mouseenter', enter);
-        row.addEventListener('mouseleave', leave);
+        row.addEventListener("mouseenter", enter);
+        row.addEventListener("mouseleave", leave);
       });
     }, section);
 
@@ -77,15 +72,13 @@ export default function EngineeringSection() {
       ref={sectionRef}
       className="section"
       style={{
-        background: 'var(--bg-light)',
+        background: "var(--bg-light)",
       }}
     >
       <div className="editorial-container">
-        <SectionLabel index="03" name="Engineering" />
-
         <h2
           className="section-heading"
-          style={{ marginBottom: 'clamp(40px, 6vw, 64px)' }}
+          style={{ marginBottom: "clamp(40px, 6vw, 64px)" }}
         >
           FOUR
           <br />
@@ -94,35 +87,31 @@ export default function EngineeringSection() {
 
         <div ref={listRef}>
           {ITEMS.map((item, i) => (
-            <div key={item.number} className="eng-row">
+            <div key={item.title} className="eng-row">
               {i === 0 && <div className="divider" />}
-              <div className="engineering-grid">
+              <div
+                style={{
+                  display: "grid",
+                  gridTemplateColumns: "minmax(180px, 1fr) 2fr",
+                  gap: "clamp(20px, 3.5vw, 56px)",
+                  alignItems: "start",
+                  padding: "clamp(24px, 2.5vw, 38px) 0",
+                }}
+              >
                 <span
                   style={{
-                    fontSize: '10px',
-                    letterSpacing: '0.12em',
-                    color: 'var(--text-label)',
-                    paddingTop: '4px',
-                    fontWeight: 500,
-                  }}
-                >
-                  {item.number}
-                </span>
-                <span
-                  style={{
-                    fontSize: 'clamp(18px, 2.2vw, 26px)',
+                    fontSize: "clamp(18px, 2.2vw, 26px)",
                     fontWeight: 300,
-                    letterSpacing: '-0.01em',
-                    color: 'var(--text-primary)',
+                    letterSpacing: "-0.01em",
+                    color: "var(--text-primary)",
                   }}
                 >
                   {item.title}
                 </span>
                 <p
-                  className="eng-desc"
                   style={{
-                    fontSize: '14px',
-                    color: 'var(--text-secondary)',
+                    fontSize: "14px",
+                    color: "var(--text-secondary)",
                     lineHeight: 1.7,
                     fontWeight: 300,
                   }}

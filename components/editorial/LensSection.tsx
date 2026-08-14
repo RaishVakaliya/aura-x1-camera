@@ -105,17 +105,6 @@ export default function LensSection() {
           width: "100%",
         }}
       >
-        <span
-          className="label gsap-item"
-          style={{
-            color: "var(--text-label)",
-            display: "block",
-            marginBottom: "clamp(24px, 4vw, 40px)",
-          }}
-        >
-          04 / Lens Architecture
-        </span>
-
         <div
           className="gsap-item"
           style={{

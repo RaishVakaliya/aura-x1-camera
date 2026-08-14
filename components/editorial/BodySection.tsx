@@ -4,7 +4,6 @@ import { useEffect, useRef } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import Image from "next/image";
-import SectionLabel from "@/components/ui/SectionLabel";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -69,10 +68,6 @@ export default function BodySection() {
       <div className="editorial-container">
         <div className="editorial-grid">
           <div ref={textRef} className="editorial-text-col">
-            <div className="gsap-item">
-              <SectionLabel index="05" name="Body" />
-            </div>
-
             <h2
               className="section-heading gsap-item"
               style={{ marginBottom: "24px" }}
