@@ -257,7 +257,6 @@ export default function CameraSequence() {
       const p1: number[] = [];
       const p2: number[] = [];
 
-      // PRIORITY 1: Immediate neighbors in scroll direction
       p1.push(centerIndex);
       for (let i = 1; i <= 2; i++) {
         const fwd = centerIndex + i * dir;
@@ -266,7 +265,6 @@ export default function CameraSequence() {
         if (bwd >= 0 && bwd < TOTAL_FRAMES) p1.push(bwd);
       }
 
-      // PRIORITY 2: Directional window (forward-biased)
       const forwardCount = isMobile ? 6 : 12;
       const backwardCount = isMobile ? 2 : 4;
 
@@ -280,14 +278,11 @@ export default function CameraSequence() {
       }
 
       const priorityIndices = [...p1, ...p2];
-
-      // Filter to only frames not yet decoded or in-flight
       const needed = priorityIndices.filter(
         (idx) =>
           !decodedCacheRef.current.has(idx) && !inFlightRef.current.has(idx),
       );
 
-      // Replace queue with newly prioritized items (preserving priority order)
       queueRef.current = Array.from(new Set(needed));
       processQueue();
     },
@@ -298,9 +293,7 @@ export default function CameraSequence() {
     (targetIndex: number) => {
       const cache = decodedCacheRef.current;
 
-      // 1. Direct Hit: Requested frame is ready in decoded cache
       if (cache.has(targetIndex)) {
-        // Redraw only if this exact frame is not already drawn
         if (
           lastRenderedFrameRef.current !== targetIndex ||
           lastRenderedTypeRef.current !== "exact"
@@ -317,7 +310,6 @@ export default function CameraSequence() {
         return;
       }
 
-      // 2. Decode requested frame immediately (high priority)
       fetchAndDecodeFrame(targetIndex)
         .then((bitmap) => {
           if (currentFrameRef.current === targetIndex) {
@@ -328,7 +320,6 @@ export default function CameraSequence() {
         })
         .catch(() => {});
 
-      // 3. Nearest-Frame Fallback (Instant, Zero Blank Flashes)
       if (cache.size > 0) {
         let bestIndex = -1;
         let minDiff = Infinity;
@@ -373,7 +364,6 @@ export default function CameraSequence() {
       width < 768 ? MAX_MOBILE_DECODED_FRAMES : MAX_DESKTOP_DECODED_FRAMES;
     evictLRU();
 
-    // Reset render tracker to force redraw with updated dimensions/DPR
     lastRenderedFrameRef.current = -1;
     renderFrame(currentFrameRef.current);
   }, [evictLRU, renderFrame]);
@@ -427,7 +417,7 @@ export default function CameraSequence() {
       })
       .catch(() => {});
 
-    // Priority 3: Low-priority idle keyframe prefetching across sequence
+    // Priority 3: Low-priority idle keyframe prefetching
     const keyframeStep = window.innerWidth < 768 ? 20 : 12;
     const keyframes: number[] = [];
     for (let k = keyframeStep; k < TOTAL_FRAMES; k += keyframeStep) {
@@ -479,14 +469,6 @@ export default function CameraSequence() {
     const section = sectionRef.current;
     if (!section) return;
 
-    if (headlineRef.current) {
-      headlineRef.current.innerText = COPY_MOMENTS[0].headline;
-      headlineRef.current.dataset.text = COPY_MOMENTS[0].headline;
-    }
-    if (subRef.current) {
-      subRef.current.innerText = COPY_MOMENTS[0].sub;
-    }
-
     const st = ScrollTrigger.create({
       trigger: section,
       start: "top top",
@@ -515,12 +497,6 @@ export default function CameraSequence() {
         }
       },
     });
-
-    gsap.fromTo(
-      copyWrapRef.current,
-      { opacity: 0, y: 14 },
-      { opacity: 1, y: 0, duration: 0.9, delay: 0.2, ease: "power2.out" },
-    );
 
     return () => {
       st.kill();
@@ -596,7 +572,7 @@ export default function CameraSequence() {
           left: "clamp(20px, 4vw, 48px)",
           zIndex: 10,
           maxWidth: "min(420px, 85vw)",
-          opacity: 0,
+          opacity: 1,
           pointerEvents: "none",
         }}
       >
@@ -607,15 +583,19 @@ export default function CameraSequence() {
             marginBottom: "12px",
             whiteSpace: "pre-line",
           }}
-          data-text=""
-        />
+          data-text="THE ART\nOF SEEING."
+        >
+          {COPY_MOMENTS[0].headline}
+        </h1>
         <p
           ref={subRef}
           className="body-text"
           style={{
             fontSize: "clamp(12px, 1.3vw, 14px)",
           }}
-        />
+        >
+          {COPY_MOMENTS[0].sub}
+        </p>
       </div>
     </section>
   );

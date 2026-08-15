@@ -2,13 +2,20 @@
 
 import { useEffect, useRef } from "react";
 import { gsap } from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+
+gsap.registerPlugin(ScrollTrigger);
 
 export default function ScrollIndicator() {
   const wrapRef = useRef<HTMLDivElement>(null);
   const lineRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const lineAnim = gsap.to(lineRef.current, {
+    const wrap = wrapRef.current;
+    const line = lineRef.current;
+    if (!wrap || !line) return;
+
+    const lineAnim = gsap.to(line, {
       scaleY: 0,
       transformOrigin: "top center",
       duration: 1.2,
@@ -17,27 +24,23 @@ export default function ScrollIndicator() {
       repeatDelay: 0.4,
     });
 
-    const onScroll = () => {
-      const scrollY = window.scrollY || document.documentElement.scrollTop || 0;
-      const progress = scrollY / (window.innerHeight * 0.5);
-
-      gsap.to(wrapRef.current, {
-        opacity: Math.max(0, 1 - progress),
-        duration: 0.2,
-        overwrite: true,
-      });
-
-      if (progress > 0.6) {
-        lineAnim.pause();
-      } else {
-        lineAnim.play();
-      }
-    };
-
-    window.addEventListener("scroll", onScroll, { passive: true });
+    const st = ScrollTrigger.create({
+      trigger: "#hero",
+      start: "top top",
+      end: "bottom top",
+      onUpdate: (self) => {
+        const p = self.progress;
+        wrap.style.opacity = String(Math.max(0, 1 - p * 2.5));
+        if (p > 0.4) {
+          if (!lineAnim.paused()) lineAnim.pause();
+        } else {
+          if (lineAnim.paused()) lineAnim.play();
+        }
+      },
+    });
 
     return () => {
-      window.removeEventListener("scroll", onScroll);
+      st.kill();
       lineAnim.kill();
     };
   }, []);
@@ -56,6 +59,7 @@ export default function ScrollIndicator() {
         alignItems: "center",
         gap: "12px",
         pointerEvents: "none",
+        transition: "opacity 0.2s ease-out",
       }}
     >
       <span

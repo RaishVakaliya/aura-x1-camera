@@ -29,6 +29,7 @@ export function LocomotiveProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     let scrollInstance: any = null;
+    let tickerCallback: ((time: number) => void) | null = null;
 
     import("locomotive-scroll").then(({ default: LocomotiveScroll }) => {
       try {
@@ -38,29 +39,38 @@ export function LocomotiveProvider({ children }: { children: ReactNode }) {
             duration: 1.2,
             smoothWheel: true,
             syncTouch: false,
-          },
-          scrollCallback: () => {
-            ScrollTrigger.update();
+            autoRaf: false,
           },
         });
 
         locoRef.current = scrollInstance;
 
-        if (scrollInstance?.lenisInstance) {
-          scrollInstance.lenisInstance.on("scroll", () => {
-            ScrollTrigger.update();
-          });
+        const lenis = scrollInstance?.lenisInstance;
+        if (lenis) {
+          lenis.on("scroll", ScrollTrigger.update);
+
+          tickerCallback = (time: number) => {
+            lenis.raf(time * 1000);
+          };
+          gsap.ticker.add(tickerCallback);
+          gsap.ticker.lagSmoothing(0);
+        } else {
+          // Fallback if lenisInstance is not exposed with autoRaf
+          ScrollTrigger.update();
         }
 
         setTimeout(() => {
           ScrollTrigger.refresh();
-        }, 150);
+        }, 100);
       } catch (err) {
         console.warn("Locomotive Scroll init:", err);
       }
     });
 
     return () => {
+      if (tickerCallback) {
+        gsap.ticker.remove(tickerCallback);
+      }
       if (scrollInstance) {
         try {
           scrollInstance.destroy();
