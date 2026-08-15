@@ -103,7 +103,7 @@ export default function OpticsSection() {
             }}
           >
             <Image
-              src="/editorial/optics.png"
+              src="/editorial/optics.avif"
               alt="AURA X1 optical system cutaway"
               width={1024}
               height={1024}

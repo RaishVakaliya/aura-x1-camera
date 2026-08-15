@@ -72,7 +72,7 @@ export default function LensSection() {
         }}
       >
         <Image
-          src="/editorial/lens.png"
+          src="/editorial/lens.avif"
           alt="AURA 50mm f/1.4 prime lens"
           fill
           quality={95}

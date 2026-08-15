@@ -125,7 +125,7 @@ export default function BodySection() {
             }}
           >
             <Image
-              src="/editorial/body.png"
+              src="/editorial/body.avif"
               alt="AURA X1 camera body"
               width={1024}
               height={1024}

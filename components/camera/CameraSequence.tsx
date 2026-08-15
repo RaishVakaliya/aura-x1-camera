@@ -73,7 +73,6 @@ export default function CameraSequence() {
     let dw: number, dh: number, dx: number, dy: number;
 
     if (W < 768 || dstAR < 1.0) {
-      // Numerical value to adjust mobile frame zoom (lower = more frame content visible, higher = closer zoom)
       const MOBILE_FRAME_SCALE = 1.45;
       const scale = (W / srcW) * MOBILE_FRAME_SCALE;
       dw = srcW * scale;
@@ -102,30 +101,25 @@ export default function CameraSequence() {
       Math.round(dh),
     );
 
-    // Seamless gradient edge blending for mobile and desktop
     if (W < 768 || dstAR < 1.0) {
-      // Top blend
       const topGrad = ctx.createLinearGradient(0, dy, 0, dy + dh * 0.24);
       topGrad.addColorStop(0, bgColor);
       topGrad.addColorStop(1, "rgba(40, 46, 54, 0)");
       ctx.fillStyle = topGrad;
       ctx.fillRect(dx - 1, dy - 1, dw + 2, dh * 0.24 + 1);
 
-      // Bottom blend
       const btmGrad = ctx.createLinearGradient(0, dy + dh * 0.76, 0, dy + dh);
       btmGrad.addColorStop(0, "rgba(40, 46, 54, 0)");
       btmGrad.addColorStop(1, bgColor);
       ctx.fillStyle = btmGrad;
       ctx.fillRect(dx - 1, dy + dh * 0.76, dw + 2, dh * 0.24 + 2);
 
-      // Left blend
       const leftGrad = ctx.createLinearGradient(dx, 0, dx + dw * 0.12, 0);
       leftGrad.addColorStop(0, bgColor);
       leftGrad.addColorStop(1, "rgba(40, 46, 54, 0)");
       ctx.fillStyle = leftGrad;
       ctx.fillRect(dx - 1, dy - 1, dw * 0.12 + 1, dh + 2);
 
-      // Right blend
       const rightGrad = ctx.createLinearGradient(dx + dw * 0.88, 0, dx + dw, 0);
       rightGrad.addColorStop(0, "rgba(40, 46, 54, 0)");
       rightGrad.addColorStop(1, bgColor);
@@ -225,6 +219,7 @@ export default function CameraSequence() {
     resizeCanvas();
 
     const firstImg = new Image();
+    firstImg.decoding = "async";
     firstImg.onload = () => {
       images[0] = firstImg;
       loaded[0] = true;
@@ -235,8 +230,9 @@ export default function CameraSequence() {
     firstImg.src = FRAME_PATH(1);
     images[0] = firstImg;
 
-    for (let k = 6; k < TOTAL_FRAMES; k += 6) {
+    for (let k = 4; k < TOTAL_FRAMES; k += 4) {
       const keyImg = new Image();
+      keyImg.decoding = "async";
       const frameIdx = k;
       keyImg.onload = () => {
         images[frameIdx] = keyImg;
@@ -250,13 +246,14 @@ export default function CameraSequence() {
     }
 
     let currentBatch = 1;
-    const batchSize = 20;
+    const batchSize = 30;
 
     const loadNextBatch = () => {
       const end = Math.min(currentBatch + batchSize, TOTAL_FRAMES);
       for (let i = currentBatch; i < end; i++) {
         if (!images[i]) {
           const img = new Image();
+          img.decoding = "async";
           const idx = i;
           img.onload = () => {
             images[idx] = img;
@@ -272,9 +269,9 @@ export default function CameraSequence() {
       currentBatch = end;
       if (currentBatch < TOTAL_FRAMES) {
         if (typeof window !== "undefined" && "requestIdleCallback" in window) {
-          (window as any).requestIdleCallback(loadNextBatch, { timeout: 800 });
+          (window as any).requestIdleCallback(loadNextBatch, { timeout: 600 });
         } else {
-          setTimeout(loadNextBatch, 35);
+          setTimeout(loadNextBatch, 20);
         }
       }
     };
